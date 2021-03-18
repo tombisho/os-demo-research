@@ -17,5 +17,6 @@ df_input <- read_csv(
 
 my_mod = summary(lm(formula = has_diab ~ bmi, data = df_input))
   
-save(my_mod, file = here::here("output", "models", "diab-model.Rdata"))
+
+write_csv(my_mod$coefficients, file = here::here("output", "models", "diab-model.csv"))
 

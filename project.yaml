@@ -19,4 +19,4 @@ actions:
     needs: [generate_cohort_diab]
     outputs:
       moderately_sensitive:
-        model: output/models/diab-model.Rdata
+        model: output/models/diab-model.csv
