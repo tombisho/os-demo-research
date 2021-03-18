@@ -1,7 +1,7 @@
 ## import libraries
 
 library('tidyverse')
-library('here')
+
 ## import data
 df_input <- read_csv(
   here::here("output", "cohorts", "input_2_diab.csv"),
@@ -18,5 +18,5 @@ df_input <- read_csv(
 my_mod = summary(lm(formula = has_diab ~ bmi, data = df_input))
   
 
-write_csv(x = as.data.frame(my_mod$coefficients), file = here::here("output", "models", "diab-model.csv"))
-
+#write_csv(x = as.data.frame(my_mod$coefficients), file = here::here("output", "models", "diab-model.csv"))
+write.csv(x = as.data.frame(my_mod$coefficients), file = here::here("output", "models", "diab-model.csv"))
