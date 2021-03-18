@@ -8,71 +8,15 @@ actions:
 
 # actions to plot TPP-STP size
 
-  generate_cohort_stppop:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_1_stppop --output-dir=output/cohorts
+  generate_cohort_diab:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_2_diab --output-dir=output/cohorts
     outputs:
       highly_sensitive:
-        cohort: output/cohorts/input_1_stppop.csv
-
-  plot_stppop:
-    run: r:latest analysis/1-plot-stppop.R
-    needs: [generate_cohort_stppop]
+        cohort: output/cohorts/input_2_diab.csv
+        
+  assoc_diab:
+    run: r:latest analysis/1-assoc_diab.R
+    needs: [generate_cohort_diab]
     outputs:
       moderately_sensitive:
-        figure: output/plots/plot_stppop_bar.png
-
-
-# actions to plot deaths over time
-
-  generate_cohort_deaths:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_2_deaths --output-dir=output/cohorts
-    outputs:
-      highly_sensitive:
-        cohort: output/cohorts/input_2_deaths.csv
-
-  plot_deaths:
-    run: r:latest analysis/2-plot-deaths.R
-    needs: [generate_cohort_deaths]
-    outputs:
-      moderately_sensitive:
-        figure: output/plots/plot_deaths.png
-
-
-# actions to plot gp activity over time
-
-  generate_cohort_activity:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_3_activity --index-date-range "2020-01-01 to 2020-09-01 by month" --output-dir=output/measures
-    outputs:
-      highly_sensitive:
-        cohort: output/measures/input_3_activity_*.csv
-
-  generate_measures_activity:
-    run: cohortextractor:latest generate_measures --study-definition study_definition_3_activity --output-dir=output/measures
-    needs: [generate_cohort_activity]
-    outputs:
-      moderately_sensitive:
-        measure_csv: output/measures/measure_*.csv
-
-  plot_activity:
-    run: r:latest analysis/3-plot-activity.R
-    needs: [generate_measures_activity]
-    outputs:
-      moderately_sensitive:
-        figure: output/plots/plot_*.png
-
-
-# alternative stppop anaylsis using better dummy data
-
-  generate_cohort_stppop_map:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_1_stppop_map --output-dir=output/cohorts
-    outputs:
-      highly_sensitive:
-        cohort: output/cohorts/input_1_stppop_map.csv
-
-  plot_stppop_map:
-    run: r:latest analysis/1-plot-stppop_map.R
-    needs: [generate_cohort_stppop_map]
-    outputs:
-      moderately_sensitive:
-        figure1: output/plots/plot_stppop_bar_names.png
-        figure2: output/plots/plot_stppop_map.png
+        model: output/models/diab-model.Rdata

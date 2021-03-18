@@ -13,10 +13,9 @@ from cohortextractor import (
 
 ## CODELISTS
 # All codelist are held within the codelist/ folder.
-codes_ICD10_covid = codelist_from_csv(
-    "codelists/opensafely-covid-identification.csv", 
-    system = "icd10", 
-    column = "icd10_code"
+
+codes_diab = codelist_from_csv(
+    "codelists/opensafely-type-2-diabetes.csv", system="ctv3", column="CTV3ID"
 )
 
 ## STUDY POPULATION
@@ -66,40 +65,25 @@ study = StudyDefinition(
         }
     ),
     
-    date_death = patients.died_from_any_cause(
-        between = [index_date, end_date],
-        returning = "date_of_death",
-        date_format = "YYYY-MM-DD",
-        return_expectations = {
-            "incidence": 0.2,
-        },
+    bmi = patients.most_recent_bmi(
+      between=["2010-02-01", "2020-01-31"],
+      minimum_age_at_measurement=18,
+      include_measurement_date=True,
+      date_format="YYYY-MM",
+      return_expectations={
+          "date": {"earliest": "2010-02-01", "latest": "2020-01-31"},
+          "float": {"distribution": "normal", "mean": 28, "stddev": 8},
+          "incidence": 0.80,
+      }
     ),
-
-    death_category = patients.categorised_as(
-        {
-            "covid-death": "died_covid",
-            "non-covid-death": "(NOT died_covid) AND died_any",
-            "alive" : "DEFAULT"
-        },
-
-        died_covid = patients.with_these_codes_on_death_certificate(
-            codes_ICD10_covid,
-            returning = "binary_flag",
-            match_only_underlying_cause = False,
-            between = [index_date, end_date],
-        ),
-
-        died_any = patients.died_from_any_cause(
-		    between = [index_date, end_date],
-		    returning = "binary_flag",
-        ),
-
-        return_expectations = {
-            "category": {"ratios": {"alive": 0.8, "covid-death": 0.1, "non-covid-death": 0.1}}, 
-            "incidence": 1
-        },
-    ),
-
     
-
+    has_diab = patients.with_these_clinical_events(
+    codes_diab,
+    returning = "binary_flag",
+    between = ["index_date", "index_date + 1 month"],
+    return_expectations={
+        "incidence": 0.1,
+        },
+    ),
+ 
 )
